@@ -1,3 +1,6 @@
+# ignore pdf files
+**/*.pdf
+
 # Haskell files
 **/dist
 **/dist-*
@@ -23,13 +26,45 @@
 **/.HTF/
 **/.ghc.environment.*
 
-# Python files
+# C files
 
-# binary files
+# Compiled object files
+**/*.o
+**/*.obj
+
+# Executables
+**/*.exe
 **/*.out
+**/a.out
 
-# ignore pdf files
-**/*.pdf
+# Libraries
+**/*.lib
+**/*.dll
+**/*.so
+**/*.dylib
+
+# Debugging information
+**/*.dSYM/
+**/*.pdb
+
+# Build directories
+**/build/
+**/bin/
+**/obj/
+
+# Editor/IDE specific files
+**/.vscode/
+**/.idea/
+**/*.swp
+**/*~
+**/*.bak
+**/*.swo
+
+# OS generated files
+**/.DS_Store
+**/Thumbs.db
+
+# Python files
 
 # Ignore python files
 **/bin/
@@ -47,9 +82,6 @@
 **/__pycache__/
 **/*.py[cod]
 **/*$py.class
-
-# C extensions
-**/*.so
 
 # Jupyter Notebook
 **/.ipynb_checkpoints
