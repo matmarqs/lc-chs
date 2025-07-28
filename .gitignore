@@ -1,23 +1,71 @@
-dist
-dist-*
-cabal-dev
-*.o
-*.hi
-*.hie
-*.chi
-*.chs.h
-*.dyn_o
-*.dyn_hi
-.hpc
-.hsenv
-.cabal-sandbox/
-cabal.sandbox.config
-*.prof
-*.aux
-*.hp
-*.eventlog
-.stack-work/
-cabal.project.local
-cabal.project.local~
-.HTF/
-.ghc.environment.*
+# Haskell files
+**/dist
+**/dist-*
+**/cabal-dev
+**/*.o
+**/*.hi
+**/*.hie
+**/*.chi
+**/*.chs.h
+**/*.dyn_o
+**/*.dyn_hi
+**/.hpc
+**/.hsenv
+**/.cabal-sandbox/
+**/cabal.sandbox.config
+**/*.prof
+**/*.aux
+**/*.hp
+**/*.eventlog
+**/.stack-work/
+**/cabal.project.local
+**/cabal.project.local~
+**/.HTF/
+**/.ghc.environment.*
+
+# Python files
+
+# binary files
+**/*.out
+
+# ignore pdf files
+**/*.pdf
+
+# Ignore python files
+**/bin/
+**/Scripts/
+**/include/
+**/lib
+**/lib/
+**/lib64
+**/lib64/
+**/pyvenv.cfg
+**/*.pyc
+**/__pycache__/
+
+# Byte-compiled / optimized / DLL files
+**/__pycache__/
+**/*.py[cod]
+**/*$py.class
+
+# C extensions
+**/*.so
+
+# Jupyter Notebook
+**/.ipynb_checkpoints
+
+# IPython
+**/profile_default/
+**/ipython_config.py
+
+# PEP 582; used by e.g. github.com/David-OConnor/pyflow and github.com/pdm-project/pdm
+**/__pypackages__/
+
+# Environments
+**/.env
+**/.venv
+**/env/
+**/venv/
+**/ENV/
+**/env.bak/
+**/venv.bak/
