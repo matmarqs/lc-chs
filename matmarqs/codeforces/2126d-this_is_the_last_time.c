@@ -19,15 +19,15 @@ int cmp_casino(const void *a, const void *b) {
     return -(ca.l - cb.l);
 }
 
-bool we_play_at_casino(Casino casino, int k) {
-    return casino.l <= k && k < casino.real;
+bool is_accessible(int l, int real, int k) {
+    return l <= k && k < real;
 }
 
 /* O(n log n) */
-int solve(Casino *casinos, int n, int k) {
-    qsort(casinos, n, sizeof(Casino), cmp_casino);
-    for (int i = 0; i < n; i++) {
-        if (we_play_at_casino(casinos[i], k)) {
+int solve(Casino *casinos, int num_casinos, int k) {
+    qsort(casinos, num_casinos, sizeof(Casino), cmp_casino);
+    for (int i = 0; i < num_casinos; i++) {
+        if (is_accessible(casinos[i].l, casinos[i].real, k)) {
             k = casinos[i].real;
         }
     }
@@ -45,10 +45,22 @@ int main() {
 
         Casino casinos[100000]; /* n <= 10^5 */
 
+        int count = 0;
         for (int i = 0; i < n; i++) {
-            scanf("%d %d %d", &casinos[i].l, &casinos[i].r , &casinos[i].real);
+            int l, r, real;
+            scanf("%d %d %d", &l, &r , &real);
+            /* otimizando, para diminuir o número de casinos que vão ser ordenados */
+            if (is_accessible(l, real, k)) {
+                k = real;
+            }
+            else {
+                casinos[count].l = l;
+                casinos[count].real = real;
+                casinos[count].r = r;
+                count++;
+            }
         }
 
-        printf("%d\n", solve(casinos, n, k));   /* O(n log n) */
+        printf("%d\n", solve(casinos, count, k));   /* O(n log n) */
     }
 }
