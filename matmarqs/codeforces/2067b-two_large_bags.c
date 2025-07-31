@@ -2,6 +2,17 @@
 #include <stdbool.h>
 
 /* O(n) */
+/* to be equalized, each item has to have an even frequency  */
+bool is_equalized(int *fst, int *snd, int n) {
+    for (int i = 1; i <= n; i++) {
+        if ((fst[i] + snd[i]) % 2 != 0) {
+            return false;
+        }
+    }
+    return true;
+}
+
+/* O(n) */
 /* return 1 <= num <= n if it can put num in second_bag */
 /* else return 0 */
 int can_put_in_second_bag(int *fst, int *snd, int n) {
@@ -17,7 +28,7 @@ int can_put_in_second_bag(int *fst, int *snd, int n) {
 /* O(n) */
 /* return 1 <= num <= n if it can increase num in first_bag */
 /* else return 0 */
-int can_increase_first(int *fst, int *snd, int n) {
+int can_increase_first_bag(int *fst, int *snd, int n) {
     for (int i = 1; i <= n; i++) {
         if (snd[i] > 0 && fst[i] > 1) {
             return i;
@@ -35,9 +46,25 @@ bool solve(int *a, int n) {
         fst[a[i]]++;
     }
 
-    int target;
-    while (target = can_put_in_second_bag(fst, snd, n)) {
-    }
+    int to_be_moved = 0, to_be_increased = 0;
+    do {
+        if (is_equalized(fst, snd, n)) {
+            return true;
+        }
+        /* at maximum, n elements can be moved (because there will be one of each in second_bag) */
+        to_be_moved = can_put_in_second_bag(fst, snd, n);
+        if (to_be_moved) {
+            fst[to_be_moved]--;
+            snd[to_be_moved]++;
+        }
+        to_be_increased = can_increase_first_bag(fst, snd, n);
+        if (to_be_increased) {
+            fst[to_be_increased]--;
+            fst[to_be_increased + 1]++;
+        }
+    } while (to_be_moved && to_be_increased);
+
+    return false;
 }
 
 int main() {
@@ -52,6 +79,12 @@ int main() {
         scanf("%d", &n);
         for (int i = 0; i < n; i++) {
             scanf("%d", &a[i]);
+        }
+        if (solve(a, n)) {
+            puts("YES");
+        }
+        else {
+            puts("NO");
         }
     }
 }
