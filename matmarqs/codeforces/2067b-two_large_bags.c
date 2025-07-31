@@ -1,70 +1,68 @@
+// Algorithm idea (Dynamic Programming):
+// The first two base values are reserved: one for the first bag, one for the second
+// for (i = 1; i < n; i++) {
+//     If count[i] == 0:
+//         There is nothing to do
+//     If count[i] > 2:
+//         Transfer the extras to the next bucket i+1: count[i+1] += count[i] - 2; count[i] = 2;
+//     This will solve the problem for all 1 <= j <= i, now we have to solve for i+1
+//     If count[i] == 1:
+//         Then it is impossible to balance the two bags for the element i
+//         We return false
+// }
+// At the end of the for loop, i == n
+// If there are an odd number of elements at count[n]:
+//     We can not balance the two bags, return false.
+// If there are an even number of elements at count[n]:
+//     We successfully balanced the two bags, return true.
+//
+// [3, 3, 4, 5, 3, 3]
+//
+//     *
+//     *                  *
+//     *                * *              * * *
+//     * * *            * * *            * * *
+// 1 2 3 4 5   ->   1 2 3 4 5   ->   1 2 3 4 5
+//
+// 
+// [1, 1, 1, 1, 1, 1, 1, 4]
+//
+// *
+// *
+// *                *
+// *                *
+// *                *                *
+// *              * *            * * *          * * * *
+// *     *        * *   *        * * * *        * * * *
+// 1 2 3 4   ->   1 2 3 4   ->   1 2 3 4   ->   1 2 3 4
+
 #include <stdio.h>
 #include <stdbool.h>
 
 /* O(n) */
-/* to be equalized, each item has to have an even frequency  */
-bool is_equalized(int *fst, int *snd, int n) {
-    for (int i = 1; i <= n; i++) {
-        if ((fst[i] + snd[i]) % 2 != 0) {
+bool solve(int *a, int n) {
+    /* count frequency of elements 1 <= i <= n <= 1000 */
+    int count[1001] = { 0 };
+    for (int i = 0; i < n; i++) {
+        count[a[i]]++;
+    }
+
+    for (int i = 1; i < n; i++) {
+        if (count[i] > 2) {
+            count[i+1] += count[i] - 2;
+            count[i] = 2;
+        }
+        if (count[i] == 1) {
             return false;
         }
     }
-    return true;
-}
 
-/* O(n) */
-/* return 1 <= num <= n if it can put num in second_bag */
-/* else return 0 */
-int can_put_in_second_bag(int *fst, int *snd, int n) {
-    /* it is worth to have one copy of each element in the second bag */
-    for (int i = 1; i <= n; i++) {
-        if (fst[i] > 1 && snd[i] == 0) {
-            return i;
-        }
+    if (count[n] % 2 == 0) {
+        return true;
     }
-    return 0;
-}
-
-/* O(n) */
-/* return 1 <= num <= n if it can increase num in first_bag */
-/* else return 0 */
-int can_increase_first_bag(int *fst, int *snd, int n) {
-    for (int i = 1; i <= n; i++) {
-        if (snd[i] > 0 && fst[i] > 1) {
-            return i;
-        }
+    else {
+        return false;
     }
-    return 0;
-}
-
-/* O(n^2) */
-bool solve(int *a, int n) {
-    /* the bags store the count */
-    int fst[1001] = { 0 };
-    int snd[1001] = { 0 };
-    for (int i = 0; i < n; i++) {
-        fst[a[i]]++;
-    }
-
-    int to_be_moved = 0, to_be_increased = 0;
-    do {
-        if (is_equalized(fst, snd, n)) {
-            return true;
-        }
-        /* at maximum, n elements can be moved (because there will be one of each in second_bag) */
-        to_be_moved = can_put_in_second_bag(fst, snd, n);
-        if (to_be_moved) {
-            fst[to_be_moved]--;
-            snd[to_be_moved]++;
-        }
-        to_be_increased = can_increase_first_bag(fst, snd, n);
-        if (to_be_increased) {
-            fst[to_be_increased]--;
-            fst[to_be_increased + 1]++;
-        }
-    } while (to_be_moved && to_be_increased);
-
-    return false;
 }
 
 int main() {
@@ -73,7 +71,6 @@ int main() {
     int a[1000];    /* 1 <= a[i] <= n */
     /* sum_{all test cases} { n^2 } <= 10^6 */
 
-    /* from the constraints, a O(n^2) solution will probably pass */
     scanf("%d", &t);
     for (; t > 0; t--) {
         scanf("%d", &n);
