@@ -1,5 +1,8 @@
 #include <stdbool.h>
 
+/*********************************************************/
+// CSR (Compressed Sparse Row) -- This is for static graphs
+
 #include <stdlib.h>
 
 #define DEFINE_HASHMAP(name, prefix, key_type, val_type, hash_func, key_equals, NOT_FOUND) \
@@ -188,22 +191,123 @@ bool int_equals(int a, int b) {
     return a == b;
 }
 
+typedef struct {
+    int n;          // number of vertices
+    int m;          // number of edges
+    int *offsets;   // size n+1, offsets[i] = start index in edges[]
+    int *edges;     // size m*2 if undirected, m if directed
+    bool *visited;
+} Graph;
 
-#include <string.h>
-
-// Hash function for strings (djb2 algorithm)
-size_t str_hash(char *key) {
-    size_t hash = 5381;
-    int c;
-    while ((c = *key++)) {
-        hash = ((hash << 5) + hash) + c;
-    }
-    return hash;
+// Create empty graph
+Graph* create_graph(int n, int m, int directed) {
+    Graph *g = malloc(sizeof(Graph));
+    g->n = n;
+    g->m = directed ? m : m * 2;
+    g->offsets = calloc(n + 1, sizeof(int));
+    g->edges   = malloc(sizeof(int) * g->m);
+    g->visited = calloc(n, sizeof(bool));
+    return g;
 }
 
-// Equality function for strings
-bool str_equals(char *a, char *b) {
-    if (a == b) return true;
-    if (!a || !b) return false;
-    return strcmp(a, b) == 0;
+// Build adjacency list from edge list
+void build_graph(Graph *g, int **edges, int m, int directed) {
+    // Count degree of each vertex
+    for (int i = 0; i < m; i++) {
+        int u = edges[i][0];
+        int v = edges[i][1];
+        g->offsets[u+1]++;
+        if (!directed) g->offsets[v+1]++;
+    }
+
+    // Prefix sum to get offsets
+    for (int i = 1; i <= g->n; i++) {
+        g->offsets[i] += g->offsets[i-1];
+    }
+
+    // Temp array to track fill positions
+    int *pos = calloc(g->n, sizeof(int));
+
+    // Fill adjacency
+    for (int i = 0; i < m; i++) {
+        int u = edges[i][0];
+        int v = edges[i][1];
+
+        int idx = g->offsets[u] + pos[u]++;
+        g->edges[idx] = v;
+
+        if (!directed) {
+            idx = g->offsets[v] + pos[v]++;
+            g->edges[idx] = u;
+        }
+    }
+
+    free(pos);
+}
+
+void free_graph(Graph *g) {
+    free(g->edges);
+    free(g->offsets);
+    free(g->visited);
+    free(g);
+}
+
+DEFINE_HASHMAP(HashMap, hashmap, int, int, int_hash, int_equals, -1);
+
+void dfs(Graph *g, int i, int *source, int *target, HashMap *h_source, HashMap *h_target) {
+    if (!g->visited[i]) {
+        g->visited[i] = true;
+
+        if (!hashmap_haskey(h_source, source[i])) {
+            hashmap_set(h_source, source[i], 1);
+        }
+        else {
+            hashmap_set(h_source, source[i], hashmap_get(h_source, source[i]) + 1);
+        }
+
+        if (!hashmap_haskey(h_target, target[i])) {
+            hashmap_set(h_target, target[i], 1);
+        }
+        else {
+            hashmap_set(h_target, target[i], hashmap_get(h_target, target[i]) + 1);
+        }
+
+        for (int j = g->offsets[i]; j < g->offsets[i+1]; j++) {
+            dfs(g, g->edges[j], source, target, h_source, h_target);
+        }
+    }
+}
+
+int min(int a, int b) {
+    return a < b ? a : b;
+}
+
+int minimumHammingDistance(int* source, int sourceSize, int* target, int targetSize, int** allowedSwaps, int allowedSwapsSize, int* allowedSwapsColSize) {
+    Graph *g = create_graph(sourceSize, allowedSwapsSize, 0);
+    build_graph(g, allowedSwaps, allowedSwapsSize, 0);
+
+    int count = 0;
+
+    for (int i = 0; i < g->n; i++) {
+        HashMap *h_source = hashmap_create(5);
+        HashMap *h_target = hashmap_create(5);
+
+        dfs(g, i, source, target, h_source, h_target);
+        HashMap_Iterator i_source = hashmap_iterator_begin(h_source);
+        int key_source, val_source;
+        int val_target;
+        while (hashmap_iterator_next(&i_source, &key_source, &val_source)) {
+            if (hashmap_haskey(h_target, key_source)) {
+                val_target = hashmap_get(h_target, key_source);
+                count += min(val_source, val_target);
+            }
+        }
+
+        hashmap_free(h_source);
+        hashmap_free(h_target);
+    }
+
+    free_graph(g);
+
+    return sourceSize - count;
 }
