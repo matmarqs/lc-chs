@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <stdbool.h>
 
 /* 
  *  The levels are either all increasing or all decreasing.
@@ -6,29 +7,37 @@
  *
  * */
 
+int increasing_condition(int a, int b) {
+    if (1 <= b - a && b - a <= 3) {
+        return 1;   /* increasing */
+    }
+    if (1 <= a - b && a - b <= 3) {
+        return -1;  /* decreasing */
+    }
+    return 0;
+}
+
 int solve(int *report, int n) {
     /* 0 = decreasing, 1 = increasing, 2 = error */
-    int increasing = report[0] < report[1] ? 1 : report[0] > report[1] ? 0 : 2;
+    int old_condition = increasing_condition(report[0], report[1]);
+    int new_condition;
 
-    if (increasing == 2) {
-        return 0;
-    }
+    int single_exception = true;
 
-    if (increasing == 1) {
-        for (int i = 1; i < n; i++) {
-            if (!(1 <= report[i] - report[i-1] && report[i] - report[i-1] <= 3)) {
-                return 0;
-            }
+    for (int i = 2; i < n; i++) {
+        new_condition = increasing_condition(report[i-1], report[i]);
+        if (single_exception && i < n-1 && new_condition != old_condition) {
+            new_condition = increasing_condition(report[i-1], report[i+1]);
+            single_exception = false;
+            i++;
         }
-    }
-    else if (increasing == 0) {
-        for (int i = 1; i < n; i++) {
-            if (!(1 <= report[i-1] - report[i] && report[i-1] - report[i] <= 3)) {
-                return 0;
-            }
+        else if (new_condition != old_condition) {
+            printf("%d %d %d %d %d | %s\n", report[0], report[1], report[2], report[3], report[4], "NOT SAFE");
+            return 0;
         }
     }
 
+    printf("%d %d %d %d %d | %s\n", report[0], report[1], report[2], report[3], report[4], "SAFE");
     return 1;
 }
 
