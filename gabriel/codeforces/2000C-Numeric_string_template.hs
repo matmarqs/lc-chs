@@ -5,8 +5,8 @@ import qualified Data.Map.Strict as M
 import qualified Data.Set as S
 
 ------------------------------------------------------------------------------
--- Esse código passa no Codeforces, mas requer sorte (trust me bro).
--- O meu passou com 1999 ms e 251300 KB.
+-- Esse código passa no Codeforces, mas talvez requeira sorte (trust me bro).
+-- O meu passou com 1562 ms e 194800 KB.
 ------------------------------------------------------------------------------
 
 zipMaybe :: [a] -> [b] -> Maybe [(a,b)]
@@ -28,7 +28,7 @@ isBij xx = case isFun xx of
              in length mm == length vv
 
 solution :: [Int] -> String -> Bool
-solution a b = maybe False isBij $ zipMaybe a b
+solution a b = maybe False isBij $ zipMaybe b a
 
 forN f = do
   n <- read <$> getLine
