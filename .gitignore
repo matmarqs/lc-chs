@@ -1,3 +1,6 @@
+# Ignore nix files
+**/*.nix
+
 # ignore pdf files
 **/*.pdf
 
