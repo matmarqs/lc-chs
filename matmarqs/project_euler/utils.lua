@@ -12,8 +12,12 @@ local function print_table(t, depth)
 	print(string.rep("  ", depth) .. "}")
 end
 
-function M.display_table(t)
-	print_table(t, 0)
+function M.dump_table(t)
+	if type(t) == "table" then
+		print_table(t, 0)
+	else
+		print(t)
+	end
 end
 
 return M

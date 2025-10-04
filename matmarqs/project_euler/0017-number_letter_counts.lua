@@ -1,4 +1,4 @@
-local display_table = require("utils").display_table
+local display_table = require("utils").dump_table
 
 local words = {
 	[1] = "one",
