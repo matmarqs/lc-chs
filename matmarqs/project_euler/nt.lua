@@ -13,23 +13,20 @@ function M.lcm(a, b)
 	return math.floor(a / M.gcd(a, b)) * b
 end
 
-local function get_lowest_prime_factor(n)
-	assert(n >= 2, "must satisfy n >= 2 to have a prime factor")
-	if n < 0 then -- assure positive integer
-		n = -n
-	end
-	if n <= 1 then -- 0 or 1
-		return n -- TODO: this is mathematically incorrect, maybe change?
-	end
-	if n <= 3 then -- 2 or 3
-		return n
-	end
-	if n % 2 == 0 then -- even number
+local function get_lowest_prime_factor(n, start)
+	n = (n >= 0) and n or -n -- assure positive integer
+	assert(n >= 2, "n must satisfy n >= 2 to have a prime factor")
+
+	start = (start and start >= 3) and start or 3 -- odd prime to start
+	assert(start % 2 == 1, "start must be an odd candidate prime")
+
+	-- take care of even numbers
+	if n % 2 == 0 then
 		return 2
 	end
 
 	-- only test odd primes
-	local i = 3
+	local i = start
 	while i * i <= n do
 		if n % i == 0 then
 			return i
@@ -43,8 +40,9 @@ end
 function M.get_prime_decomposition(n)
 	assert(n >= 0, "n must be non-negative")
 	local prime_count = {}
+	local p = 2
 	while n > 1 do
-		local p = get_lowest_prime_factor(n)
+		p = get_lowest_prime_factor(n, p)
 		prime_count[p] = (prime_count[p] or 0) + 1
 		n = math.floor(n / p)
 	end
@@ -83,6 +81,15 @@ function M.chooses(n, k)
 		prod = math.floor(prod * (n - i + 1) / i)
 	end
 	return prod
+end
+
+function M.sum_of_proper_divisors(n)
+	local decomp = M.get_prime_decomposition(n)
+	local prod = 1
+	for p, e in pairs(decomp) do
+		prod = prod * ((p ^ (e + 1) - 1) / (p - 1))
+	end
+	return prod - n
 end
 
 return M

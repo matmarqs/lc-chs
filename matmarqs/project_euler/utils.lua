@@ -20,4 +20,14 @@ function M.dump_table(t)
 	end
 end
 
+function M.read_file(path)
+	local file = io.open(path, "rb")
+	if not file then
+		return nil
+	end
+	local content = file:read("*all")
+	file:close()
+	return content
+end
+
 return M
