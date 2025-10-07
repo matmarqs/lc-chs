@@ -50,7 +50,7 @@ function M.get_prime_decomposition(n)
 end
 
 function M.is_prime(n)
-	assert(n >= 0, "n must be non-negative")
+	n = (n >= 0) and n or -n -- assure positive integer
 	if n <= 1 then
 		return false
 	end
